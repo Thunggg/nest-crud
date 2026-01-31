@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrismaClientValidationError } from '@prisma/client/runtime/client'
 import { Prisma } from 'src/generated/prisma/client'
 import { HashingService } from 'src/shared/services/hashing.service'
@@ -31,6 +31,8 @@ export class AuthService {
       } else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new ConflictException('Email already exists')
       }
+
+      throw new InternalServerErrorException('Register failed')
     }
   }
 }
