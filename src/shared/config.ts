@@ -1,6 +1,7 @@
 import { plainToInstance } from 'class-transformer'
 import { IsString, validateSync } from 'class-validator'
 import fs from 'fs'
+import type { StringValue } from 'ms'
 import path from 'path'
 
 // kiểm ra xem có file env hay chưa
@@ -13,13 +14,16 @@ class ConfigSchema {
   DATABASE_URL: string
 
   @IsString()
-  ACCESS_TOKEN_EXPIRES_IN: string
+  ACCESS_TOKEN_SECRET: string
+
+  @IsString()
+  ACCESS_TOKEN_EXPIRES_IN: StringValue
 
   @IsString()
   REFRESH_TOKEN_SECRET: string
 
   @IsString()
-  REFRESH_TOKEN_EXPIRES_IN: string
+  REFRESH_TOKEN_EXPIRES_IN: StringValue
 
   @IsString()
   PORT: string
