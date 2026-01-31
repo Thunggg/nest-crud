@@ -23,7 +23,7 @@ export class AuthService {
         },
       })
 
-      console.log(user)
+      return user
     } catch (error) {
       console.log(error)
       if (error instanceof PrismaClientValidationError) {
