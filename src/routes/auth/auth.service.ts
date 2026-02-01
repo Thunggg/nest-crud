@@ -75,9 +75,11 @@ export class AuthService {
         throw new UnauthorizedException('Account is not exist!')
       }
 
+      console.log(2)
+
       const isPasswordMatch = await this.hashingService.verify(body.password, user.password)
 
-      if (!user) {
+      if (!isPasswordMatch) {
         throw new UnprocessableEntityException({
           field: 'password',
           error: 'Password is incorrect',
@@ -92,9 +94,10 @@ export class AuthService {
         throw new ConflictException('The field not be empty')
       } else if (isUniqueConstraintPrismaError(error)) {
         throw new ConflictException('Email already exists')
+      } else if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException(error.message)
       }
-
-      throw new InternalServerErrorException('Register failed')
+      throw new InternalServerErrorException('Login failed')
     }
   }
 
