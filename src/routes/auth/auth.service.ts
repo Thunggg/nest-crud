@@ -6,7 +6,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common'
 import { PrismaClientValidationError } from '@prisma/client/runtime/client'
-import { Prisma } from 'src/generated/prisma/client'
+import { isNotFoundPrismaError, isUniqueConstraintPrismaError } from 'src/shared/helper'
 import { HashingService } from 'src/shared/services/hashing.service'
 import { PrismaService } from 'src/shared/services/prisma.service'
 import { TokenService } from 'src/shared/services/token.service'
@@ -37,7 +37,7 @@ export class AuthService {
       console.log(error)
       if (error instanceof PrismaClientValidationError) {
         throw new ConflictException('The field not be empty')
-      } else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      } else if (isUniqueConstraintPrismaError(error)) {
         throw new ConflictException('Email already exists')
       }
 
@@ -90,7 +90,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientValidationError) {
         throw new ConflictException('The field not be empty')
-      } else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      } else if (isUniqueConstraintPrismaError(error)) {
         throw new ConflictException('Email already exists')
       }
 
@@ -112,7 +112,7 @@ export class AuthService {
 
       return await this.generateToken({ userId })
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (isNotFoundPrismaError(error)) {
         throw new UnauthorizedException('Refresh token has been revoked!')
       }
       throw new UnauthorizedException()
