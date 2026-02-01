@@ -10,7 +10,7 @@ import { isNotFoundPrismaError, isUniqueConstraintPrismaError } from 'src/shared
 import { HashingService } from 'src/shared/services/hashing.service'
 import { PrismaService } from 'src/shared/services/prisma.service'
 import { TokenService } from 'src/shared/services/token.service'
-import { LoginBodyDTO, RefreshTokenBodyDTO, RegisterBodyDTO } from './auth.dto'
+import { LoginBodyDTO, LogoutBodyDTO, RefreshTokenBodyDTO, RegisterBodyDTO } from './auth.dto'
 
 @Injectable()
 export class AuthService {
@@ -111,6 +111,25 @@ export class AuthService {
       })
 
       return await this.generateToken({ userId })
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) {
+        throw new UnauthorizedException('Refresh token has been revoked!')
+      }
+      throw new UnauthorizedException()
+    }
+  }
+
+  async logout(body: LogoutBodyDTO) {
+    try {
+      const { refreshToken } = body
+
+      await this.prismaService.refreshToken.delete({
+        where: {
+          token: refreshToken,
+        },
+      })
+
+      return { message: 'Logout successfully' }
     } catch (error) {
       if (isNotFoundPrismaError(error)) {
         throw new UnauthorizedException('Refresh token has been revoked!')

@@ -3,6 +3,8 @@ import { AuthenticationGuard } from 'src/shared/guards/authentication.guard'
 import {
   LoginBodyDTO,
   LoginResDTO,
+  LogoutBodyDTO,
+  LogoutResDTO,
   RefreshTokenBodyDTO,
   RefreshTokenResDTO,
   RegisterBodyDTO,
@@ -29,5 +31,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() body: RefreshTokenBodyDTO) {
     return new RefreshTokenResDTO(await this.authService.refreshToken(body))
+  }
+
+  @Post('logout')
+  async logout(@Body() body: LogoutBodyDTO) {
+    return new LogoutResDTO(await this.authService.logout(body))
   }
 }
