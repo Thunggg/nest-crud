@@ -14,6 +14,9 @@ class ConfigSchema {
   DATABASE_URL: string
 
   @IsString()
+  SECRET_KEY: string
+
+  @IsString()
   ACCESS_TOKEN_SECRET: string
 
   @IsString()
