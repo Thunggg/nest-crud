@@ -10,7 +10,7 @@ import { Prisma } from 'src/generated/prisma/client'
 import { HashingService } from 'src/shared/services/hashing.service'
 import { PrismaService } from 'src/shared/services/prisma.service'
 import { TokenService } from 'src/shared/services/token.service'
-import { LoginBodyDTO, RegisterBodyDTO } from './auth.dto'
+import { LoginBodyDTO, RefreshTokenBodyDTO, RegisterBodyDTO } from './auth.dto'
 
 @Injectable()
 export class AuthService {
@@ -88,7 +88,6 @@ export class AuthService {
 
       return { accessToken, refreshToken }
     } catch (error) {
-      console.log(error)
       if (error instanceof PrismaClientValidationError) {
         throw new ConflictException('The field not be empty')
       } else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -96,6 +95,27 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException('Register failed')
+    }
+  }
+
+  async refreshToken(body: RefreshTokenBodyDTO) {
+    try {
+      const { refreshToken } = body
+
+      const { userId } = await this.tokenService.verifyRefreshToken(refreshToken)
+
+      await this.prismaService.refreshToken.findUniqueOrThrow({
+        where: {
+          token: refreshToken,
+        },
+      })
+
+      return await this.generateToken({ userId })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new UnauthorizedException('Refresh token has been revoked!')
+      }
+      throw new UnauthorizedException()
     }
   }
 }

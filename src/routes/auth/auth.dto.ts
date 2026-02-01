@@ -38,3 +38,16 @@ export class RegisterResDTO {
     Object.assign(this, partial)
   }
 }
+
+export class RefreshTokenBodyDTO {
+  @IsString()
+  refreshToken: string
+}
+
+export class RefreshTokenResDTO {
+  refreshToken: string
+
+  constructor(partial: Partial<RefreshTokenResDTO>) {
+    Object.assign(this, partial)
+  }
+}
